@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "2DShape.h"
 #include "Shader.h"
+#include "Texture.h"
 #include <iostream>
 
 const char * DEFAULT_VERTEX_SHADER = "../../resources/shader/default.vert";
@@ -12,6 +13,8 @@ const char * DEFAULT_FRAGMENT_SHADER = "../../resources/shader/default.frag";
 Camera camera(glm::vec3(0.0f, 0.0f, 4.0f));
 float lastX = 0.0f;
 float lastY = 0.0f;
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
 bool firstMouse = true;
 bool cameraMode = false;
 bool keys[1024];
@@ -24,14 +27,10 @@ public:
     void InitGLFWWindow(const char* title);
     void Run();
     void Shutdown() {};
+    void CameraMove();
 
     GLFWwindow* _window {nullptr};
     Renderer _renderer;
-private:
-    friend void KeyboardCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-    friend void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
-    friend void MousePositionCallback(GLFWwindow *window, double xPos, double yPos);
-    friend void ScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 };
 
 void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -150,18 +149,43 @@ void Application::InitGLFWWindow(const char* title) {
     glfwSetScrollCallback(_window, ScrollCallback);
 }
 
-
+void Application::CameraMove() {
+    if (keys[GLFW_KEY_W])
+        camera.KeyboardCall(FORWARD, deltaTime);
+    if (keys[GLFW_KEY_S])
+        camera.KeyboardCall(BACKWARD, deltaTime);
+    if (keys[GLFW_KEY_A])
+        camera.KeyboardCall(LEFT, deltaTime);
+    if (keys[GLFW_KEY_D])
+        camera.KeyboardCall(RIGHT, deltaTime);
+}
 
 void Application::Run() {
     Rectangle rectangle;
     Shader rectangleShader;
+    Texture rectangleTexture;
     rectangleShader.SetShader(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
-    
+    rectangleTexture.SetTexture("../../resources/texture/Wood.png", "Lion", true);
+    rectangleTexture.UseTexture();
+    rectangleShader.SetUniform1i("u_Texture", 0);
+
     while(!glfwWindowShouldClose(_window)) {
+
+        GLfloat currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         glfwPollEvents();
-        glfwSwapBuffers(_window);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        CameraMove();
+
+        glm::mat4 projection = glm::perspective(camera.cameraFOV, (float)1920 / (float)1080, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 model;
+
+        _renderer.Clear();
         _renderer.Render(camera, rectangle, rectangleShader);
+        glfwSwapBuffers(_window);
     }
 }
 

@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 
-
+#include "glm/glm.hpp"
 #include "Shader.h"
 
 
@@ -86,10 +86,41 @@ void Shader::SetShader(const GLchar* vertexPath, const GLchar* fragmentPath)
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 
-    std::cout << vertexCode << std::endl;
-    std::cout << fragmentCode << std::endl;
+    // std::cout << vertexCode << std::endl;
+    // std::cout << fragmentCode << std::endl;
 }
 
+void Shader::SetUniform1i(const std::string& name, int value)
+{
+    glUniform1i(GetUniformLocation(name), value);
+}
+
+void Shader::SetUniform1f(const std::string& name, float value)
+{
+    glUniform1f(GetUniformLocation(name), value);
+}
+
+void Shader::SetUniform4f(const std::string& name, float f0, float f1, float f2, float f3)
+{
+    glUniform4f(GetUniformLocation(name), f0, f1, f2, f3);
+}
+
+void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+{
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+}
+
+GLint Shader::GetUniformLocation(const std::string& name) {
+    if(_shaderCache.find(name) != _shaderCache.end()) {
+        return _shaderCache[name];
+    }
+    int location = glGetUniformLocation(_program, name.c_str());
+    if(location == -1) {
+        std::cout << "No active uniform variable with name " << name << " found" << std::endl;
+    }
+    _shaderCache[name] = location;
+    return location;
+}
 
 void Shader::UseShader()
 {

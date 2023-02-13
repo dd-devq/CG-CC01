@@ -9,11 +9,11 @@
 
 
 class Renderer {
-	std::vector<Renderable> _renderList;
 public:
 	Renderer();
 	~Renderer();
     void Init();
+    void Clear() const;
     void Update(const Camera& camera);
     void Shutdown() const;
     void UpdateView(const Camera& camera);
