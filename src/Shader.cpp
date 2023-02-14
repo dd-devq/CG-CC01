@@ -4,6 +4,8 @@
 #include <iostream>
 
 #include "glm/glm.hpp"
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Shader.h"
 
 
@@ -85,9 +87,6 @@ void Shader::SetShader(const GLchar* vertexPath, const GLchar* fragmentPath)
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-
-    // std::cout << vertexCode << std::endl;
-    // std::cout << fragmentCode << std::endl;
 }
 
 void Shader::SetUniform1i(const std::string& name, int value)
@@ -107,7 +106,7 @@ void Shader::SetUniform4f(const std::string& name, float f0, float f1, float f2,
 
 void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
 {
-    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 GLint Shader::GetUniformLocation(const std::string& name) {

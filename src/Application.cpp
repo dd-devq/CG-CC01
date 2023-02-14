@@ -4,6 +4,11 @@
 #include "Shader.h"
 #include "Texture.h"
 #include <iostream>
+#include "Cube.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 const char * DEFAULT_VERTEX_SHADER = "../../resources/shader/default.vert";
 const char * DEFAULT_FRAGMENT_SHADER = "../../resources/shader/default.frag";
@@ -18,6 +23,11 @@ GLfloat lastFrame = 0.0f;
 bool firstMouse = true;
 bool cameraMode = false;
 bool keys[1024];
+GLfloat modelRotationSpeed = 0.0f;
+glm::vec3 modelPosition = glm::vec3(0.0f);
+glm::vec3 modelRotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 modelScale = glm::vec3(0.75f);
+
 
 class Application {
 public:
@@ -161,13 +171,14 @@ void Application::CameraMove() {
 }
 
 void Application::Run() {
-    Rectangle rectangle;
+    Cube cube;
     Shader rectangleShader;
     Texture rectangleTexture;
     rectangleShader.SetShader(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
-    rectangleTexture.SetTexture("../../resources/texture/Wood.png", "Lion", true);
+    rectangleTexture.SetTexture("../../resources/texture/Lion.jpg", "Lion", true);
     rectangleTexture.UseTexture();
     rectangleShader.SetUniform1i("u_Texture", 0);
+
 
     while(!glfwWindowShouldClose(_window)) {
 
@@ -179,12 +190,26 @@ void Application::Run() {
 
         CameraMove();
 
-        glm::mat4 projection = glm::perspective(camera.cameraFOV, (float)1920 / (float)1080, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 model;
-
         _renderer.Clear();
-        _renderer.Render(camera, rectangle, rectangleShader);
+
+        rectangleShader.UseShader();
+
+        glm::mat4 projection = glm::perspective(glm::radians(camera.FOV), (float)1280 / (float)720, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+
+        GLfloat rotationAngle = glfwGetTime() / 5.0f * modelRotationSpeed;
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, modelPosition);
+        model = glm::rotate(model, rotationAngle, modelRotationAxis);
+        model = glm::scale(model, modelScale);
+
+        glm::mat4 u_mvp = projection * view * model;
+
+        rectangleShader.SetUniformMat4f("u_mvp", u_mvp);
+
+        _renderer.Render(camera, cube, rectangleShader);
+
+
         glfwSwapBuffers(_window);
     }
 }
