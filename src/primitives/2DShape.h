@@ -44,7 +44,7 @@ Rectangle::~Rectangle() {
 
 void Rectangle::Render() const {
     glBindVertexArray(_vao);
-	glDrawElements(STRIP, RectangleData::vertices.size(), GL_UNSIGNED_INT, nullptr);
+	glDrawElements(STRIP, RectangleData::indices.size(), GL_UNSIGNED_INT, nullptr);
 }
 
 void Rectangle::Init() {

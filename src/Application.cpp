@@ -60,8 +60,11 @@ void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int
 
 void MousePositionCallback(GLFWwindow *window, double xPos, double yPos)
 {
-    if (firstMouse)
-    {
+    if (!window) {
+        return;
+    }
+
+    if (firstMouse) {
         lastX = xPos;
         lastY = yPos;
         firstMouse = false;
@@ -72,24 +75,38 @@ void MousePositionCallback(GLFWwindow *window, double xPos, double yPos)
     lastX = xPos;
     lastY = yPos;
 
-    if (cameraMode)
+    if (cameraMode) {
         camera.MouseCall(xOffset, yOffset);
+    }
 }
 
 
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+    if (!window) {
+        return;
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         cameraMode = true;
-    else
+    }
+    else {
         cameraMode = false;
+    }
 }
 
 
 void ScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-    if (cameraMode)
+    if (!window) {
+        return;
+    }
+
+    std::cout << "OFFSET: (" << xOffset << ", " << yOffset << ")";
+
+    if (cameraMode) {
         camera.ScrollCall(yOffset);
+    }
 }
 
 
@@ -107,6 +124,7 @@ void Application::InitGLFWWindow(const char* title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
     glfwWindowHint(GLFW_SAMPLES, 16);
 
     GLFWmonitor* glfwMonitor = glfwGetPrimaryMonitor();
@@ -175,7 +193,7 @@ void Application::Run() {
     Shader rectangleShader;
     Texture rectangleTexture;
     rectangleShader.SetShader(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
-    rectangleTexture.SetTexture("../../resources/texture/Lion.jpg", "Lion", true);
+    rectangleTexture.SetTexture("../../resources/texture/Lion.jpg", "Wood", true);
     rectangleTexture.UseTexture();
     rectangleShader.SetUniform1i("u_Texture", 0);
 
