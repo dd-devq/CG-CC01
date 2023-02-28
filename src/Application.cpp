@@ -204,7 +204,6 @@ void Application::Run() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        glfwPollEvents();
 
         CameraMove();
 
@@ -226,9 +225,10 @@ void Application::Run() {
         rectangleShader.SetUniformMat4f("u_mvp", u_mvp);
 
         _renderer.Render(camera, cube, rectangleShader);
-
-
+    
         glfwSwapBuffers(_window);
+        glfwPollEvents();
+
     }
 }
 
