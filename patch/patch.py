@@ -1,10 +1,12 @@
 import OpenGL.GL as GL              # standard Python OpenGL wrapper
 import numpy as np
 import pandas as pd
-
-from kstn2021.libs.shader import *
-from kstn2021.libs import transform as T
-from kstn2021.libs.buffer import *
+import os, sys
+from os.path import dirname, join, abspath
+sys.path.insert(0, abspath(join(dirname(__file__), '..')))
+from libs.shader import *
+from libs import transform as T
+from libs.buffer import *
 import ctypes
 
 

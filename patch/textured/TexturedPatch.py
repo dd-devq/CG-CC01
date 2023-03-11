@@ -1,6 +1,6 @@
-from kstn2021.libs.shader import *
-from kstn2021.libs import transform as T
-from kstn2021.libs.buffer import *
+from libs.shader import *
+from libs import transform as T
+from libs.buffer import *
 import ctypes
 import cv2
 import glfw

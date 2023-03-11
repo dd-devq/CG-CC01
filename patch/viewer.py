@@ -1,8 +1,14 @@
 import OpenGL.GL as GL              # standard Python OpenGL wrapper
 import glfw                         # lean windows system wrapper for OpenGL
 import numpy as np                  # all matrix manipulations & OpenGL args
+
+import os, sys 
+from os.path import dirname, join, abspath
+
+sys.path.insert(0, abspath(join(dirname(__file__), '..')))
+sys.path.insert(0, abspath(join(dirname(__file__), '.')))
 from patch import *
-from kstn2021.patch.textured.TexturedPatch import *
+from textured.TexturedPatch import *
 
 # ------------  Viewer class & windows management ------------------------------
 class Viewer:
