@@ -9,51 +9,28 @@ from libs.shader import *
 from libs import transform as T
 from libs.buffer import *
 
+def gen_points(smoothness):
+    step =  10.0 / smoothness
+    points = []
+    x = 10.0
+    y = 10.0
+    for i in range(smoothness * 2 + 1):
+        for t in range(smoothness * 2 + 1):
+            points.append([x, 0, y])
+            y -= step
+        y = 10.0
+        x -= step
+    return points
 
-def cylinder(radius, height, sides):
+def mesh(smoothness, aconst = 1.0, bconst = 1.0, const = 0.0):
     vertices, indices, color = [], [], []
-    color_step = 0
-    for i in range(sides):
-        theta = 2 * np.pi * i / sides
-        x = radius * np.cos(theta)
-        y = radius * np.sin(theta)
-        vertices += [[x, y, -height / 2], [x, y, height / 2]]
-        color += [1, 1, 0]
-        color += [0, 1, 1]
-
-    color += [1, 1, 0]
-    color += [0, 1, 1]
-
-    for i in range(len(vertices)):
-        indices += [i]
-    indices += [0, 1]
-
-    vertices += [[0, 0, -height / 2]]
-
-    indices += [1, 0]
-    for i in range(len(vertices) - 1):
-        if(i % 2 == 0):
-            indices += [i]
-            indices += [len(vertices) - 1]
-    indices += [0, 0]
-    
-    indices += [1]
-    vertices += [[0, 0, height/2]]
-    for i in range(len(vertices) - 1):
-        if(i % 2 != 0):
-            indices += [i]
-            indices += [len(vertices) - 1]
-    indices += [1]
-    indices += [len(vertices) - 1]
-    # Convert vertex and index data to NumPy arrays
-    vertices = np.array(vertices, dtype=np.float32)
-    color = np.array(color, dtype=np.float32)
-    indices = np.array(indices, dtype=np.uint32)
+    points = gen_points(smoothness)
+    print(points)
     return vertices, indices, color
 
-class Cylinder(object):
+class Mesh(object):
     def __init__(self, vert_shader, frag_shader):
-        self.vertices, self.indices, self.colors = cylinder(1, 1, 30)
+        self.vertices, self.indices, self.colors = mesh(5)
         self.normals = [] # YOUR CODE HERE to compute vertex's normal using the coordinates
         self.vao = VAO()
 
