@@ -18,6 +18,7 @@ from shapes.triangle import *
 from shapes.pyramid import *
 from shapes.cone import *
 from shapes.sphere import *
+from shapes.mesh import *
 
 
 class Viewer:
@@ -122,6 +123,7 @@ def printUsage():
     print('python main.py Pyramid Gouraud')
     print('python main.py Cone Gouraud')
     print('python main.py Sphere Gouraud')
+    print('python main.py Mesh Gouraud')
 
 
 def main(argv):
@@ -147,6 +149,9 @@ def main(argv):
     elif argv[0] == 'Sphere' and argv[1] == 'Gouraud':
         model = Sphere('resources/shaders/gouraud.vert',
                        'resources/shaders/gouraud.frag').setup()
+    elif argv[0] == 'Mesh' and argv[1] == 'Gouraud':
+        model = Mesh('resources/shaders/gouraud.vert',
+                     'resources/shaders/gouraud.frag').setup()
 
     viewer.add(model)
     viewer.run()
