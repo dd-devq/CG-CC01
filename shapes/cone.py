@@ -1,6 +1,7 @@
 from libs.buffer import *
 from libs import transform as T
 from libs.shader import *
+from libs.utils import *
 import ctypes
 import glfw
 import math
@@ -47,7 +48,7 @@ class Cone(object):
     def __init__(self, vert_shader, frag_shader):
         self.vertices, self.indices, self.colors = create_cone(32, 2.0, 1.5)
 
-        self.normals = []
+        # self.normals = generate_normals(self.vertices, self.indices)
         self.vao = VAO()
 
         self.shader = Shader(vert_shader, frag_shader)

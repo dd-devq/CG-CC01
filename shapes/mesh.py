@@ -7,6 +7,7 @@ from sympy import *
 from libs.shader import *
 from libs import transform as T
 from libs.buffer import *
+from libs.utils import *
 
 
 def gen_points(smoothness):
@@ -57,7 +58,7 @@ def mesh(smoothness, xvar=1.0, yvar=1.0, const=0.0):
 
 class Mesh(object):
     def __init__(self, vert_shader, frag_shader):
-        self.vertices, self.indices, self.colors = mesh(10)
+        self.vertices, self.indices, self.colors = mesh(20, 1, 1)
         print(len(self.vertices))
         print(self.vertices)
         print(self.indices)
@@ -88,6 +89,77 @@ class Mesh(object):
 
         self.uma.upload_uniform_matrix4fv(projection, 'projection', True)
         self.uma.upload_uniform_matrix4fv(modelview, 'modelview', True)
+
+        self.vao.activate()
+        GL.glDrawElements(GL.GL_TRIANGLES,
+                          self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
+
+    def key_handler(self, key):
+
+        if key == glfw.KEY_1:
+            self.selected_texture = 1
+        if key == glfw.KEY_2:
+            self.selected_texture = 2
+
+
+class MeshPhong(object):
+    def __init__(self, vert_shader, frag_shader):
+        self.vertices, self.indices, self.colors = mesh(20, 1, 1)
+        self.normals = generate_normals(self.vertices, self.indices)
+        self.vao = VAO()
+
+        self.shader = Shader(vert_shader, frag_shader)
+        self.uma = UManager(self.shader)
+        #
+
+    """
+    Create object -> call setup -> call draw
+    """
+
+    def setup(self):
+        self.vao.add_vbo(0, self.vertices, ncomponents=3,
+                         dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
+        self.vao.add_vbo(1, self.colors, ncomponents=3,
+                         dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
+        self.vao.add_vbo(2, self.normals, ncomponents=3,
+                         dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
+
+        self.vao.add_ebo(self.indices)
+
+        GL.glUseProgram(self.shader.render_idx)
+        modelview = view
+
+        self.uma.upload_uniform_matrix4fv(projection, 'projection', True)
+        self.uma.upload_uniform_matrix4fv(modelview, 'modelview', True)
+        # Light
+        I_light = np.array([
+            [0.9, 0.4, 0.6],  # diffuse
+            [0.9, 0.4, 0.6],  # specular
+            [0.9, 0.4, 0.6]  # ambient
+        ], dtype=np.float32)
+        light_pos = np.array([0, 0.5, 0.9], dtype=np.float32)
+
+        self.uma.upload_uniform_matrix3fv(I_light, 'I_light', False)
+        self.uma.upload_uniform_vector3fv(light_pos, 'light_pos')
+
+        # Materials
+        K_materials = np.array([
+            [0.6, 0.4, 0.7],  # diffuse
+            [0.6, 0.4, 0.7],  # specular
+            [0.6, 0.4, 0.7]  # ambient
+        ], dtype=np.float32)
+
+        self.uma.upload_uniform_matrix3fv(K_materials, 'K_materials', False)
+
+        shininess = 100.0
+        mode = 1
+
+        self.uma.upload_uniform_scalar1f(shininess, 'shininess')
+        self.uma.upload_uniform_scalar1i(mode, 'mode')
+
+        return self
+
+    def draw(self, projection, view, model):
 
         self.vao.activate()
         GL.glDrawElements(GL.GL_TRIANGLES,

@@ -1,33 +1,35 @@
+from libs.buffer import *
+from libs import transform as T
+from libs.shader import *
 import ctypes
 import glfw
-import os, sys
+import os
+import sys
 import numpy as np
 from os.path import dirname, join, abspath
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
-from libs.shader import *
-from libs import transform as T
-from libs.buffer import *
+
 
 class Tetrahedron(object):
     def __init__(self, vert_shader, frag_shader):
         self.vertices = np.array(
             # YOUR CODE HERE to specify vertex's coordinates
             [
-                [0, 0, 0], # A
-                [1, 0, 0], # D
-                [0, 0, 1], # C
-                [0, 1, 0]  # B
-            ], dtype = np.float32
+                [0, 0, 0],  # A
+                [1, 0, 0],  # D
+                [0, 0, 1],  # C
+                [0, 1, 0]   # B
+            ], dtype=np.float32
         )
 
         self.indices = np.array(
             # YOUR CODE HERE to specify index data
             [
                 3, 0, 2, 1, 3, 0
-            ], dtype = np.uint32
+            ], dtype=np.uint32
         )
 
-        self.normals = [] # YOUR CODE HERE to compute vertex's normal using the coordinates
+        self.normals = []  # YOUR CODE HERE to compute vertex's normal using the coordinates
 
         # colors: RGB format
         self.colors = np.array(
@@ -37,7 +39,7 @@ class Tetrahedron(object):
                 [1, 0, 0],
                 [0, 0, 1],
                 [0, 1, 0],
-            ],dtype= np.float32
+            ], dtype=np.float32
         )
 
         self.vao = VAO()
@@ -45,14 +47,15 @@ class Tetrahedron(object):
         self.shader = Shader(vert_shader, frag_shader)
         self.uma = UManager(self.shader)
         #
-     
 
     """
     Create object -> call setup -> call draw
     """
+
     def setup(self):
         # setup VAO for drawing cylinder's side
-        self.vao.add_vbo(0, self.vertices, ncomponents=3, stride=0, offset=None)
+        self.vao.add_vbo(0, self.vertices, ncomponents=3,
+                         stride=0, offset=None)
         self.vao.add_vbo(1, self.colors, ncomponents=3, stride=0, offset=None)
         # setup EBO for drawing cylinder's side, bottom and top
         self.vao.add_ebo(self.indices)
@@ -67,8 +70,8 @@ class Tetrahedron(object):
         self.uma.upload_uniform_matrix4fv(modelview, 'modelview', True)
 
         self.vao.activate()
-        GL.glDrawElements(GL.GL_TRIANGLE_STRIP, self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
-
+        GL.glDrawElements(GL.GL_TRIANGLE_STRIP,
+                          self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
 
     def key_handler(self, key):
 
@@ -76,4 +79,3 @@ class Tetrahedron(object):
             self.selected_texture = 1
         if key == glfw.KEY_2:
             self.selected_texture = 2
-

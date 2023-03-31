@@ -19,6 +19,7 @@ from shapes.pyramid import *
 from shapes.cone import *
 from shapes.sphere import *
 from shapes.mesh import *
+from shapes.ellipsoid import *
 
 
 class Viewer:
@@ -55,6 +56,7 @@ class Viewer:
 
         # initialize GL by setting viewport and default render characteristics
         GL.glClearColor(0.5, 0.5, 0.5, 0.1)
+        # GL.glClearColor(0, 0, 0, 1)
         # GL.glEnable(GL.GL_CULL_FACE)   # enable backface culling (Exercise 1)
         # GL.glFrontFace(GL.GL_CCW) # GL_CCW: default
 
@@ -123,6 +125,7 @@ def printUsage():
     print('python main.py Pyramid Gouraud')
     print('python main.py Cone Gouraud')
     print('python main.py Sphere Gouraud')
+    print('python main.py Ellipsoid Gouraud')
     print('python main.py Mesh Gouraud')
 
 
@@ -149,6 +152,9 @@ def main(argv):
     elif argv[0] == 'Sphere' and argv[1] == 'Gouraud':
         model = Sphere('resources/shaders/gouraud.vert',
                        'resources/shaders/gouraud.frag').setup()
+    elif argv[0] == 'Ellipsoid' and argv[1] == 'Gouraud':
+        model = Ellipsoid('resources/shaders/gouraud.vert',
+                          'resources/shaders/gouraud.frag').setup()
     elif argv[0] == 'Mesh' and argv[1] == 'Gouraud':
         model = Mesh('resources/shaders/gouraud.vert',
                      'resources/shaders/gouraud.frag').setup()
