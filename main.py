@@ -2,12 +2,11 @@
 
 import OpenGL.GL as GL
 import glfw
-import numpy as np
+from itertools import cycle
 
 # ------------ Library Import ------------
 
 from libs.transform import Trackball
-from itertools import cycle
 
 # ------------ Shape Import ------------
 
@@ -19,6 +18,7 @@ from shapes.pyramid import *
 from shapes.cone import *
 from shapes.sphere import *
 from shapes.mesh import *
+from shapes.frustum import *
 from shapes.ellipsoid import *
 
 
@@ -121,12 +121,23 @@ def printUsage():
     print('python main.py Cube Gouraud')
     print('python main.py Tetrahedron Gouraud')
     print('python main.py Cylinder Gouraud')
-    print('python main.py Triangle Gouraud')
     print('python main.py Pyramid Gouraud')
     print('python main.py Cone Gouraud')
-    print('python main.py Sphere Gouraud')
+    print('python main.py Sphere1 Gouraud')
+    print('python main.py Sphere2 Gouraud')
     print('python main.py Ellipsoid Gouraud')
     print('python main.py Mesh Gouraud')
+    print('python main.py Frustum Gouraud')
+    print('python main.py Cube Phong')
+    print('python main.py Tetrahedron Phong')
+    print('python main.py Cylinder Phong')
+    print('python main.py Pyramid Phong')
+    print('python main.py Cone Phong')
+    print('python main.py Sphere1 Phong')
+    print('python main.py Sphere2 Phong')
+    print('python main.py Ellipsoid Phong')
+    print('python main.py Mesh Phong')
+    print('python main.py Frustum Phong')
 
 
 def main(argv):
@@ -149,15 +160,51 @@ def main(argv):
     elif argv[0] == 'Cone' and argv[1] == 'Gouraud':
         model = Cone('resources/shaders/gouraud.vert',
                      'resources/shaders/gouraud.frag').setup()
-    elif argv[0] == 'Sphere' and argv[1] == 'Gouraud':
-        model = Sphere('resources/shaders/gouraud.vert',
-                       'resources/shaders/gouraud.frag').setup()
+    elif argv[0] == 'Sphere1' and argv[1] == 'Gouraud':
+        model = Sphere1('resources/shaders/gouraud.vert',
+                        'resources/shaders/gouraud.frag').setup()
+    elif argv[0] == 'Sphere2' and argv[1] == 'Gouraud':
+        model = Sphere2('resources/shaders/gouraud.vert',
+                        'resources/shaders/gouraud.frag').setup()
     elif argv[0] == 'Ellipsoid' and argv[1] == 'Gouraud':
         model = Ellipsoid('resources/shaders/gouraud.vert',
                           'resources/shaders/gouraud.frag').setup()
     elif argv[0] == 'Mesh' and argv[1] == 'Gouraud':
         model = Mesh('resources/shaders/gouraud.vert',
                      'resources/shaders/gouraud.frag').setup()
+    elif argv[0] == 'Frustum' and argv[1] == 'Gouraud':
+        model = Frustum('resources/shaders/gouraud.vert',
+                        'resources/shaders/gouraud.frag').setup()
+    elif argv[0] == 'Cube' and argv[1] == 'Phong':
+        model = CubePhong('resources/shaders/phong.vert',
+                          'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Pyramid' and argv[1] == 'Phong':
+        model = PyramidPhong('resources/shaders/phong.vert',
+                             'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Cylinder' and argv[1] == 'Phong':
+        model = CylinderPhong('resources/shaders/phong.vert',
+                              'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Tetrahedron' and argv[1] == 'Phong':
+        model = TetrahedronPhong('resources/shaders/phong.vert',
+                                 'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Cone' and argv[1] == 'Phong':
+        model = ConePhong('resources/shaders/phong.vert',
+                          'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Sphere1' and argv[1] == 'Phong':
+        model = SpherePhong1('resources/shaders/phong.vert',
+                             'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Sphere2' and argv[1] == 'Phong':
+        model = SpherePhong2('resources/shaders/phong.vert',
+                             'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Ellipsoid' and argv[1] == 'Phong':
+        model = EllipsoidPhong('resources/shaders/phong.vert',
+                               'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Mesh' and argv[1] == 'Phong':
+        model = MeshPhong('resources/shaders/phong.vert',
+                          'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Frustum' and argv[1] == 'Phong':
+        model = FrustumPhong('resources/shaders/phong.vert',
+                             'resources/shaders/phong.frag').setup()
 
     viewer.add(model)
     viewer.run()

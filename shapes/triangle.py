@@ -1,14 +1,14 @@
+from libs.buffer import *
+from libs import transform as T
+from libs.shader import *
 import OpenGL.GL as GL              # standard Python OpenGL wrapper
 import numpy as np
 import ctypes
-import os, sys
+import os
+import sys
 
 from os.path import dirname, join, abspath
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
-
-from libs.shader import *
-from libs import transform as T
-from libs.buffer import *
 
 
 class Triangle:
@@ -16,7 +16,7 @@ class Triangle:
         self.vertices = np.array([
             [-1, -1, 0],
             [+1, -1, 0],
-            [ 0, +1, 0]
+            [0, +1, 0]
         ], dtype=np.float32)
         normals = np.random.normal(0, 3, (3, 3)).astype(np.float32)
         normals[:, 2] = np.abs(normals[:, 2])
@@ -35,9 +35,12 @@ class Triangle:
         #
 
     def setup(self):
-        self.vao.add_vbo(0, self.vertices, ncomponents=3, dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
-        self.vao.add_vbo(1, self.colors, ncomponents=3, dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
-        self.vao.add_vbo(2, self.normals, ncomponents=3, dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
+        self.vao.add_vbo(0, self.vertices, ncomponents=3,
+                         dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
+        self.vao.add_vbo(1, self.colors, ncomponents=3,
+                         dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
+        self.vao.add_vbo(2, self.normals, ncomponents=3,
+                         dtype=GL.GL_FLOAT, normalized=False, stride=0, offset=None)
 
         GL.glUseProgram(self.shader.render_idx)
         projection = T.ortho(-1, 1, -1, 1, -1, 1)
@@ -92,7 +95,7 @@ class TriangleEx:
         vertex_color = np.array([
             [-1, -1, 0, 1.0, 0.0, 0.0],
             [+1, -1, 0, 0.0, 1.0, 0.0],
-            [ 0, +1, 0, 0.0, 0.0, 1.0]
+            [0, +1, 0, 0.0, 0.0, 1.0]
         ], dtype=np.float32)
         normals = np.random.normal(0, 3, (3, 3)).astype(np.float32)
         normals[:, 2] = np.abs(normals[:, 2])
@@ -110,9 +113,12 @@ class TriangleEx:
         offset_v = ctypes.c_void_p(0)  # None
         offset_c = ctypes.c_void_p(3*4)
         offset_n = ctypes.c_void_p(6*4)
-        self.vao.add_vbo(0, self.vertex_attrib, ncomponents=3, dtype=GL.GL_FLOAT, normalized=False, stride=stride, offset=offset_v)
-        self.vao.add_vbo(1, self.vertex_attrib, ncomponents=3, dtype=GL.GL_FLOAT, normalized=False, stride=stride, offset=offset_c)
-        self.vao.add_vbo(2, self.vertex_attrib, ncomponents=3, dtype=GL.GL_FLOAT, normalized=False, stride=stride, offset=offset_n)
+        self.vao.add_vbo(0, self.vertex_attrib, ncomponents=3, dtype=GL.GL_FLOAT,
+                         normalized=False, stride=stride, offset=offset_v)
+        self.vao.add_vbo(1, self.vertex_attrib, ncomponents=3, dtype=GL.GL_FLOAT,
+                         normalized=False, stride=stride, offset=offset_c)
+        self.vao.add_vbo(2, self.vertex_attrib, ncomponents=3, dtype=GL.GL_FLOAT,
+                         normalized=False, stride=stride, offset=offset_n)
 
         GL.glUseProgram(self.shader.render_idx)
         normalMat = np.identity(4, 'f')

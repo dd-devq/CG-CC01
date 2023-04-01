@@ -8,47 +8,11 @@ import math
 import numpy as np
 
 
-def create_cone(num_segments, height, radius):
-    vertices, indices, color = [], [], []
-    angle_step = 2.0 * np.pi / num_segments
-
-    vertices.append([0.0, height, 0.0])
-    color.append([1, 0, 1])
-
-    for i in range(num_segments):
-        angle = i * angle_step
-        x = radius * np.cos(angle)
-        y = -height
-        z = radius * np.sin(angle)
-        vertices.append([x, y, z])
-        color.append([1, 0, 1])
-    color.append([1, 0, 1])
-
-    for i in range(num_segments - 1):
-        indices.append(i + 1)
-        indices.append(0)
-        indices.append(i + 2)
-
-    indices.append(num_segments)
-    indices.append(0)
-    indices.append(1)
-    vertices.append([0.0, -height, 0.0])
-
-    for i in range(1, len(vertices) - 1):
-        indices.append(i)
-        indices.append(len(vertices) - 1)
-
-    vertices = np.array(vertices, dtype=np.float32)
-    indices = np.array(indices, dtype=np.uint32)
-    color = np.array(color, dtype=np.float32)
-    return vertices, indices, color
-
-
 class Cone(object):
     def __init__(self, vert_shader, frag_shader):
-        self.vertices, self.indices, self.colors = create_cone(32, 2.0, 1.5)
+        self.vertices, self.indices, self.colors = cone(32, 2.0, 1.5)
+        self.normals = calculate_vertex_normals(self.vertices, self.indices)
 
-        # self.normals = generate_normals(self.vertices, self.indices)
         self.vao = VAO()
 
         self.shader = Shader(vert_shader, frag_shader)
@@ -79,3 +43,65 @@ class Cone(object):
             self.selected_texture = 1
         if key == glfw.KEY_2:
             self.selected_texture = 2
+        elif key == glfw.KEY_3:
+            capture("result/cone/cone-gouraud.png")
+        elif key == glfw.KEY_4:
+            capture("result/cone/cone-gouraud-wireframe.png")
+
+
+class ConePhong(object):
+    def __init__(self, vert_shader, frag_shader):
+        self.vertices, self.indices, self.colors = cone(32, 2.0, 1.5)
+        self.normals = calculate_vertex_normals(self.vertices, self.indices)
+
+        self.vao = VAO()
+
+        self.shader = Shader(vert_shader, frag_shader)
+        self.uma = UManager(self.shader)
+
+    def setup(self):
+        self.vao.add_vbo(0, self.vertices, ncomponents=3, dtype=GL.GL_FLOAT)
+        self.vao.add_vbo(1, self.colors, ncomponents=3, dtype=GL.GL_FLOAT)
+        self.vao.add_vbo(2, self.normals, ncomponents=3, dtype=GL.GL_FLOAT)
+        self.vao.add_ebo(self.indices)
+
+        normalMat = np.identity(4, dtype=np.float32)
+
+        I_light = np.array([0.9, 0.4, 0.6], dtype=np.float32)
+        light_pos = np.array([0, 0.5, 0.9], dtype=np.float32)
+        K_materials = np.array([0.6, 0.4, 0.7], dtype=np.float32)
+
+        shininess = 100.0
+        mode = 1
+
+        GL.glUseProgram(self.shader.render_idx)
+
+        self.uma.upload_uniform_matrix4fv(normalMat, 'normalMat', True)
+        self.uma.upload_uniform_matrix3fv(I_light, 'I_light', False)
+        self.uma.upload_uniform_vector3fv(light_pos, 'light_pos')
+        self.uma.upload_uniform_matrix3fv(K_materials, 'K_materials', False)
+        self.uma.upload_uniform_scalar1f(shininess, 'shininess')
+        self.uma.upload_uniform_scalar1i(mode, 'mode')
+        return self
+
+    def draw(self, projection, view, model):
+        GL.glUseProgram(self.shader.render_idx)
+        modelview = view
+
+        self.uma.upload_uniform_matrix4fv(projection, 'projection', True)
+        self.uma.upload_uniform_matrix4fv(modelview, 'modelview', True)
+
+        self.vao.activate()
+        GL.glDrawElements(GL.GL_TRIANGLES,
+                          self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
+
+    def key_handler(self, key):
+
+        if key == glfw.KEY_1:
+            self.selected_texture = 1
+        if key == glfw.KEY_2:
+            self.selected_texture = 2
+        elif key == glfw.KEY_3:
+            capture("result/cone/cone-phong.png")
+        elif key == glfw.KEY_4:
+            capture("result/cone/cone-phong-wireframe.png")

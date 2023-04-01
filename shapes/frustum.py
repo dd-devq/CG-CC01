@@ -4,41 +4,14 @@ from libs.shader import *
 from libs.utils import *
 import ctypes
 import glfw
+import math
 import numpy as np
 
 
-class Pyramid(object):
+class Frustum(object):
     def __init__(self, vert_shader, frag_shader):
-        self.vertices = np.array(
-            [
-                [0.0, 1.0, 0.0],  # 0
-                [-0.5, 0.0, -0.5],  # 1
-                [0.5, 0.0, -0.5],  # 2
-                [0.5, 0.0, 0.5],  # 3
-                [-0.5, 0.0, 0.5]  # 4
-
-            ], dtype=np.float32
-        )
-
-        self.indices = np.array(
-            [
-                3, 0, 4, 1, 3, 2, 0, 1
-            ], dtype=np.uint32
-        )
-
-        self.normals = calculate_vertex_normals_2(self.vertices, self.indices)
-
-        # colors: RGB format
-        self.colors = np.array(
-            [
-                [0.5, 0, 0.5],
-                [1, 1, 0],
-                [0, 1, 1],
-                [0, 1, 0],
-                [1, 1, 1],
-            ], dtype=np.float32
-        )
-
+        self.vertices, self.indices, self.colors = frustum(6, 2, 10)
+        self.normals = calculate_vertex_normals(self.vertices, self.indices)
         self.vao = VAO()
 
         self.shader = Shader(vert_shader, frag_shader)
@@ -49,9 +22,11 @@ class Pyramid(object):
     """
 
     def setup(self):
+        # setup VAO for drawing cylinder's side
         self.vao.add_vbo(0, self.vertices, ncomponents=3,
                          stride=0, offset=None)
         self.vao.add_vbo(1, self.colors, ncomponents=3, stride=0, offset=None)
+        # setup EBO for drawing cylinder's side, bottom and top
         self.vao.add_ebo(self.indices)
 
         return self
@@ -64,7 +39,7 @@ class Pyramid(object):
         self.uma.upload_uniform_matrix4fv(modelview, 'modelview', True)
 
         self.vao.activate()
-        GL.glDrawElements(GL.GL_TRIANGLE_STRIP,
+        GL.glDrawElements(GL.GL_TRIANGLES,
                           self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
 
     def key_handler(self, key):
@@ -74,44 +49,18 @@ class Pyramid(object):
         if key == glfw.KEY_2:
             self.selected_texture = 2
         elif key == glfw.KEY_3:
-            capture("result/pyramid/pyramid-gouraud.png")
+            capture("result/frustum/frustum-gouraud.png")
         elif key == glfw.KEY_4:
-            capture("result/pyramid/pyramid-gouraud-wireframe.png")
+            capture("result/frustum/frustum-gouraud-wireframe.png")
 
 
-class PyramidPhong(object):
+class FrustumPhong(object):
     def __init__(self, vert_shader, frag_shader):
-        self.vertices = np.array(
-            [
-                [0.0, 1.0, 0.0],  # 0
-                [-0.5, 0.0, -0.5],  # 1
-                [0.5, 0.0, -0.5],  # 2
-                [0.5, 0.0, 0.5],  # 3
-                [-0.5, 0.0, 0.5]  # 4
-
-            ], dtype=np.float32
-        )
-
-        self.indices = np.array(
-            [
-                3, 0, 4, 1, 3, 2, 0, 1
-            ], dtype=np.uint32
-        )
-
-        self.normals = calculate_vertex_normals_2(self.vertices, self.indices)
-
-        # colors: RGB format
-        self.colors = np.array(
-            [
-                [0.5, 0, 0.5],
-                [1, 1, 0],
-                [0, 1, 1],
-                [0, 1, 0],
-                [1, 1, 1],
-            ], dtype=np.float32
-        )
-
+        self.vertices, self.indices, self.colors = frustum(6, 2, 10)
+        self.normals = calculate_vertex_normals(self.vertices, self.indices)
         self.vao = VAO()
+        print(len(self.normals))
+        print(len(self.vertices))
 
         self.shader = Shader(vert_shader, frag_shader)
         self.uma = UManager(self.shader)
@@ -121,6 +70,7 @@ class PyramidPhong(object):
     """
 
     def setup(self):
+
         self.vao.add_vbo(0, self.vertices, ncomponents=3, dtype=GL.GL_FLOAT)
         self.vao.add_vbo(1, self.colors, ncomponents=3, dtype=GL.GL_FLOAT)
         self.vao.add_vbo(2, self.normals, ncomponents=3, dtype=GL.GL_FLOAT)
@@ -143,26 +93,26 @@ class PyramidPhong(object):
         self.uma.upload_uniform_matrix3fv(K_materials, 'K_materials', False)
         self.uma.upload_uniform_scalar1f(shininess, 'shininess')
         self.uma.upload_uniform_scalar1i(mode, 'mode')
+
         return self
 
     def draw(self, projection, view, model):
-        GL.glUseProgram(self.shader.render_idx)
-        modelview = view
+        self.vao.activate()
 
+        GL.glUseProgram(self.shader.render_idx)
+
+        modelview = view
         self.uma.upload_uniform_matrix4fv(projection, 'projection', True)
         self.uma.upload_uniform_matrix4fv(modelview, 'modelview', True)
-
-        self.vao.activate()
-        GL.glDrawElements(GL.GL_TRIANGLE_STRIP,
-                          self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
+        GL.glDrawElements(
+            GL.GL_TRIANGLES, self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
 
     def key_handler(self, key):
-
         if key == glfw.KEY_1:
             self.selected_texture = 1
-        if key == glfw.KEY_2:
+        elif key == glfw.KEY_2:
             self.selected_texture = 2
         elif key == glfw.KEY_3:
-            capture("result/pyramid/pyramid-phong.png")
+            capture("result/frustum/frustum-phong.png")
         elif key == glfw.KEY_4:
-            capture("result/pyramid/pyramid-phong-wireframe.png")
+            capture("result/frustum/frustum-phong-wireframe.png")
