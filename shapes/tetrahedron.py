@@ -121,9 +121,13 @@ class TetrahedronPhong(object):
 
         normalMat = np.identity(4, dtype=np.float32)
 
-        I_light = np.array([0.9, 0.4, 0.6], dtype=np.float32)
+        I_light = np.array([[0.9, 0.4, 0.6],
+                            [0.9, 0.4, 0.6],
+                            [0.9, 0.4, 0.6]], dtype=np.float32)
         light_pos = np.array([0, 0.5, 0.9], dtype=np.float32)
-        K_materials = np.array([0.6, 0.4, 0.7], dtype=np.float32)
+        K_materials = np.array([[0.6, 0.4, 0.7],
+                                [0.6, 0.4, 0.7],
+                                [0.6, 0.4, 0.7]], dtype=np.float32)
 
         shininess = 100.0
         mode = 1
