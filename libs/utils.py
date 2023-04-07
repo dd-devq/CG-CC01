@@ -329,7 +329,8 @@ def gen_points(smoothness):
 def mesh(smoothness, xvar=1.0, yvar=1.0, const=0.0):
     vertices, indices, color = [], [], []
     x, y = symbols("x y")
-    expr = xvar*cos(x) + yvar*sin(y) + const
+    # expr = xvar*cos(x) + yvar*sin(y) + const
+    expr = (1 - x**2 - y**2)*exp(-1/2 * (x**2 + y**2))
 
     points = gen_points(smoothness)
 

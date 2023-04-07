@@ -24,11 +24,9 @@ class Mesh(object):
     """
 
     def setup(self):
-        # setup VAO for drawing cylinder's side
         self.vao.add_vbo(0, self.vertices, ncomponents=3,
                          stride=0, offset=None)
         self.vao.add_vbo(1, self.colors, ncomponents=3, stride=0, offset=None)
-        # setup EBO for drawing cylinder's side, bottom and top
         self.vao.add_ebo(self.indices)
 
         return self
