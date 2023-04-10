@@ -17,7 +17,6 @@ class Mesh(object):
 
         self.shader = Shader(vert_shader, frag_shader)
         self.uma = UManager(self.shader)
-        #
 
     """
     Create object -> call setup -> call draw
@@ -56,7 +55,7 @@ class Mesh(object):
 
 class MeshPhong:
     def __init__(self, vert_shader, frag_shader):
-        self.vertices, self.indices, self.colors = mesh(30, 1, 1)
+        self.vertices, self.indices, self.colors = mesh(32, 1, 1)
         self.normals = calculate_vertex_normals(self.vertices, self.indices)
         self.vao = VAO()
         self.shader = Shader(vert_shader, frag_shader)

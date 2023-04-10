@@ -313,15 +313,15 @@ def ellipsoid(radius1, radius2, radius3, num_segments):
 
 
 def gen_points(smoothness):
-    step = 10.0 / smoothness
+    step = 5.0 / smoothness
     points = []
-    x = 10.0
-    y = 10.0
+    x = 5.0
+    y = 5.0
     for i in range(smoothness * 2 + 1):
         for t in range(smoothness * 2 + 1):
             points.append([x, 0, y])
             y -= step
-        y = 10.0
+        y = 5.0
         x -= step
     return points
 
