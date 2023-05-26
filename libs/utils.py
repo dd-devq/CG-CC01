@@ -4,26 +4,29 @@ import math
 from OpenGL.GL import *
 from PIL import Image
 
-# GL_TRIANGLES
+
+def normalize(v):
+    norm = np.linalg.norm(v)
+    if norm == 0:
+        return v
+    return v / norm
 
 
 def calculate_vertex_normals(vertices, indices):
     normals = np.zeros(vertices.shape, dtype=np.float32)
-
     for i in range(0, len(indices), 3):
         i1, i2, i3 = indices[i:i+3]
-        v1, v2, v3 = vertices[i1], vertices[i2], vertices[i3]
-        normal = np.cross(v2 - v1, v3 - v1)
-        normal /= np.linalg.norm(normal)
-        normal = np.nan_to_num(normal, nan=0)
+        v1, v2, v3 = np.array(vertices[i1]), np.array(
+            vertices[i2]), np.array(vertices[i3])
+        normal = normalize(np.cross(v2 - v1, v3 - v1))
         normals[i1] += normal
         normals[i2] += normal
         normals[i3] += normal
-
-    normals /= np.linalg.norm(normals, axis=1)[:, np.newaxis]
-    normal = np.nan_to_num(normal, nan=0)
-
+    normals_len = np.linalg.norm(normals, axis=1)
+    normals_len[normals_len == 0] = 1e-7
+    normals /= normals_len.reshape(-1, 1)
     return normals
+
 
 # GL_TRIANGLE_STRIPS
 
@@ -33,18 +36,18 @@ def calculate_vertex_normals_2(vertices, indices):
 
     for i in range(0, len(indices) - 2):
         i1, i2, i3 = indices[i:i+3]
-        v1, v2, v3 = vertices[i1], vertices[i2], vertices[i3]
-        normal = np.cross(v2 - v1, v3 - v1)
-        normal /= np.linalg.norm(normal)
+        v1, v2, v3 = np.array(vertices[i1]), np.array(
+            vertices[i2]), np.array(vertices[i3])
+        normal = normalize(np.cross(v2 - v1, v3 - v1))
         normals[i1] += normal
         normals[i2] += normal
         normals[i3] += normal
-
-    normals /= np.linalg.norm(normals, axis=1)[:, np.newaxis]
+    normals_len = np.linalg.norm(normals, axis=1)
+    normals_len[normals_len == 0] = 1e-7
+    normals /= normals_len.reshape(-1, 1)
     return normals
 
-
-# ------------ Sphere 1 ------------
+    # ------------ Sphere 1 ------------
 
 
 def sphere_1(radius, num_segments):
@@ -72,6 +75,34 @@ def sphere_1(radius, num_segments):
 
     return np.array(vertices, dtype=np.float32), np.array(indices, dtype=np.uint32)
 
+
+def tex_sphere_1(radius, num_segments):
+    vertices, indices, texcoords = [], [], []
+    for i in range(num_segments + 1):
+        theta1 = i * math.pi / num_segments
+        sin_theta1 = math.sin(theta1)
+        cos_theta1 = math.cos(theta1)
+
+        for j in range(num_segments + 1):
+            phi1 = j * 2 * math.pi / num_segments
+            sin_phi1 = math.sin(phi1)
+            cos_phi1 = math.cos(phi1)
+            x = radius * sin_theta1 * cos_phi1
+            y = radius * sin_theta1 * sin_phi1
+            z = radius * cos_theta1
+
+            vertices += [[x, y, z]]
+            texcoords += [[j / num_segments, i / num_segments]]
+
+            if i < num_segments and j < num_segments:
+                first = (i * (num_segments + 1)) + j
+                second = first + num_segments + 1
+                indices.extend([first, second, first + 1])
+                indices.extend([second, second + 1, first + 1])
+
+    return np.array(vertices, dtype=np.float32), np.array(indices, dtype=np.uint32), np.array(texcoords, dtype=np.float32)
+
+
 # ------------ Sphere 2 ------------
 
 
@@ -87,12 +118,6 @@ def create_tetrahedron():
     indices = [0, 1, 2, 0, 2, 3, 0, 3, 1, 1, 3, 2]
 
     return vertices, indices
-
-
-def normalize(vec):
-    # normalize a 3D vector
-    length = math.sqrt(vec[0]**2 + vec[1]**2 + vec[2]**2)
-    return [vec[0]/length, vec[1]/length, vec[2]/length]
 
 
 def subdivide(face, vertices):
@@ -329,13 +354,12 @@ def gen_points(smoothness):
 def mesh(smoothness, xvar=1.0, yvar=1.0, const=0.0):
     vertices, indices, color = [], [], []
     x, y = symbols("x y")
-    # expr = xvar*cos(x) + yvar*sin(y) + const
-    expr = (1 - x**2 - y**2)*exp(-1/2 * (x**2 + y**2))
+    expr = xvar*cos(x) + yvar*sin(y) + const
 
     points = gen_points(smoothness)
 
     for point in points:
-        z = expr.subs([(x, point[0]), (y, point[2])])
+        z = - expr.subs([(x, point[0]), (y, point[2])])
         point[1] = z
         vertices.append(point)
     vertices.reverse()
@@ -353,10 +377,10 @@ def mesh(smoothness, xvar=1.0, yvar=1.0, const=0.0):
         indices.append(i + 2*smoothness + 2)
         indices.append(i + 1)
         counter = counter + 1
-
+    vertices = np.array(vertices, dtype=np.float32)
     for i in range(len(vertices)):
-        color.append([1, 0, 1])
-    return np.array(vertices, dtype=np.float32), np.array(indices, dtype=np.uint32), np.array(color, dtype=np.float32)
+        color.append([1, 1, 1])
+    return vertices, np.array(indices, dtype=np.uint32), np.array(color, dtype=np.float32)
 
 
 # ------------ Capture Screen ------------

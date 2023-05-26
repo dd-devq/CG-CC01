@@ -133,6 +133,7 @@ def printUsage():
     print('python main.py Cylinder Phong')
     print('python main.py Pyramid Phong')
     print('python main.py Cone Phong')
+    print('python main.py Sphere1 PhongTex')
     print('python main.py Sphere1 Phong')
     print('python main.py Sphere2 Phong')
     print('python main.py Ellipsoid Phong')
@@ -190,18 +191,29 @@ def main(argv):
     elif argv[0] == 'Cone' and argv[1] == 'Phong':
         model = ConePhong('resources/shaders/phong.vert',
                           'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'Sphere1' and argv[1] == 'PhongTex':
+        model = TexSpherePhong1('resources/shaders/phongtex.vert',
+                                'resources/shaders/phongtex.frag').setup()
     elif argv[0] == 'Sphere1' and argv[1] == 'Phong':
         model = SpherePhong1('resources/shaders/phong.vert',
                              'resources/shaders/phong.frag').setup()
     elif argv[0] == 'Sphere2' and argv[1] == 'Phong':
         model = SpherePhong2('resources/shaders/phong.vert',
                              'resources/shaders/phong.frag').setup()
+
     elif argv[0] == 'Ellipsoid' and argv[1] == 'Phong':
         model = EllipsoidPhong('resources/shaders/phong.vert',
                                'resources/shaders/phong.frag').setup()
     elif argv[0] == 'Mesh' and argv[1] == 'Phong':
         model = MeshPhong('resources/shaders/phong.vert',
                           'resources/shaders/phong.frag').setup()
+    elif argv[0] == 'MeshS' and argv[1] == 'Phong':
+        model = MeshPhong('resources/shaders/phong.vert',
+                          'resources/shaders/phong.frag').setup()
+        model_2 = SpherePhong1('resources/shaders/phong.vert',
+                               'resources/shaders/phong.frag').setup()
+        viewer.add(model_2)
+
     elif argv[0] == 'Frustum' and argv[1] == 'Phong':
         model = FrustumPhong('resources/shaders/phong.vert',
                              'resources/shaders/phong.frag').setup()

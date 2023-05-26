@@ -10,7 +10,6 @@ out vec3 vertPos;
 out vec3 colorInterp;
 
 
-
 void main(){
   colorInterp = color;
   vec4 vertPos4 = modelview * vec4(position, 1.0);
