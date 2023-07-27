@@ -3,19 +3,19 @@
 precision mediump float;
 in vec3 normal_interp;  // Surface normal
 in vec3 vert_pos;       // Vertex position
-in vec3 color_interp;
+in vec3 colorInterp;
 in vec2 texcoord_interp;
 
 uniform mat3 K_materials;
 uniform mat3 I_light;
 
-uniform float phong_factor; //
+uniform float phong_factor; // Shininess
 uniform float shininess; // Shininess
 uniform vec3 light_pos; // Light position
 out vec4 fragColor;
 
+
 uniform sampler2D texture;
-uniform int selected_texture;
 
 void main() {
   vec3 N = normalize(normal_interp);
@@ -28,15 +28,11 @@ void main() {
   float specAngle = max(dot(R, V), 0.0);
   float specular = pow(specAngle, shininess);
   vec3 g = vec3(lvd*max(dot(L, N), 0.0), specular, 1.0);
-  vec3 rgb = matrixCompMult(K_materials, I_light) * g; // +  colorInterp;
+  vec3 rgb = matrixCompMult(K_materials, I_light) * g * 0.25; 
 
   fragColor = vec4(rgb, 1.0);
-  vec4 color_interp4 = vec4(color_interp, 1.0);
+  vec4 colorInterp4 = vec4(colorInterp, 1.0);
   float color_factor = 0.2;
   float texture_factor = 1.0 - (color_factor + phong_factor);
-
-  vec4 texture_color;
-  texture_color = texture2D(texture, texcoord_interp);
-
-  fragColor = 0*color_factor*color_interp4 + phong_factor*fragColor + texture_factor*texture_color;
+  fragColor = color_factor*colorInterp4 + phong_factor*fragColor + texture_factor*texture2D(texture, texcoord_interp);
 }

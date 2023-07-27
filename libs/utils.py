@@ -397,3 +397,27 @@ def capture(save_path):
     image = image.transpose(Image.FLIP_TOP_BOTTOM)
 
     image.save(save_path)
+
+
+def generate_texture_coordinates(vertices, indices):
+    texture_coordinates = []
+
+    for index in indices:
+        vertex = vertices[index]
+        x, y, z = vertex
+        tex_coord = (x, z)  # Use (x, z) as texture coordinates
+        texture_coordinates.append(tex_coord)
+
+    # Normalize the texture coordinates to the range [0, 1]
+    min_x = min(coord[0] for coord in texture_coordinates)
+    max_x = max(coord[0] for coord in texture_coordinates)
+    min_z = min(coord[1] for coord in texture_coordinates)
+    max_z = max(coord[1] for coord in texture_coordinates)
+
+    normalized_texture_coordinates = []
+    for coord in texture_coordinates:
+        x = (coord[0] - min_x) / (max_x - min_x)
+        z = (coord[1] - min_z) / (max_z - min_z)
+        normalized_texture_coordinates.append((x, z))
+
+    return normalized_texture_coordinates
